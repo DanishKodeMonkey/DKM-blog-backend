@@ -7,8 +7,7 @@ const cors = require('cors');
 
 //import routes
 const usersRouter = require('./routes/users');
-const postsRouter = require('./routes/posts');
-const commentsRouter = require('./routes/comments');
+const blogRouter = require('/routes/blog');
 
 const app = express();
 
@@ -19,8 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // set up routes
 app.use('/users', usersRouter);
-app.use('/posts', postsRouter);
-app.use('/comments', commentsRouter);
+app.use('/blog', blogRouter);
 
 // server setup
 if (process.env.NODE_ENV === 'development') {
