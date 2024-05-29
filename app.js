@@ -1,23 +1,34 @@
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+// import package modules
+const express = require('express');
+const cors = require('cors');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+//import routes
+const usersRouter = require('./routes/users');
+const postsRouter = require('./routes/posts');
+const commentsRouter = require('./routes/comments');
 
-var app = express();
+const app = express();
 
-app.use(logger('dev'));
+//middleware
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: true }));
 
-app.use('/', indexRouter);
+// set up routes
 app.use('/users', usersRouter);
+app.use('/posts', postsRouter);
+app.use('/comments', commentsRouter);
 
-module.exports = app;
+// server setup
+if (process.env.NODE_ENV === 'development') {
+    app.listen(process.env.PORT, () =>
+        console.log(
+            `[server]: Server is running at https://localhost:${process.env.PORT}`
+        )
+    );
+}
+
+export default app;
