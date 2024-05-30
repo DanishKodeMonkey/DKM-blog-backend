@@ -141,17 +141,15 @@ exports.editUser = [
 ];
 
 exports.deleteUser = asyncHandler(async (req, res, next) => {
-    // To be implemented when needed:
-    // Ensure only admin, or own user, can delete account
-    // Delete any comments/posts associated with user before deleting user?
-
-    // extract message ID from params
     const userId = req.params.userId;
 
     const user = await Users.findById(userId);
 
     if (!user) {
         return res.sendStatus(404, 'User not found');
+    }
+    if (req.user.id !== userId && req.user.membership !== 'Author') {
+        return res.sendStatus(403, 'Unauthorized user deletion');
     }
 
     await Users.findByIdAndDelete(userId);
