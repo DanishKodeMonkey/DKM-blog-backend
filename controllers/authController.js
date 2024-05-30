@@ -33,3 +33,6 @@ exports.signIn = asyncHandler(async (req, res, next) => {
         // and invoke this process immediately.
     })(req, res, next);
 });
+
+// TODO
+// Signout? How? What is needed?
