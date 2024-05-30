@@ -15,4 +15,4 @@ PostSchema.virtual('url').get(function () {
     return `/posts/${this._id}`;
 });
 
-module.exports = mongoose.model('Posts', UserSchema);
+module.exports = mongoose.model('Posts', PostSchema);
