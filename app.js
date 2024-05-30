@@ -5,13 +5,22 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
+const mongoose = require('mongoose');
 
 //import routes
 const usersRouter = require('./routes/users');
 const blogRouter = require('./routes/blog');
 
 const app = express();
+// mongoDB setup and connect
+mongoose.set('strictQuery', false);
+const mongoDB = process.env.MONGO_URI;
+// attempt to start MongoDB operation
 
+main().catch(err => console.error(err));
+async function main() {
+    await mongoose.connect(mongoDB);
+}
 //middleware
 app.use(logger('combined'));
 app.use(cors());
