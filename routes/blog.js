@@ -1,6 +1,6 @@
-import express from 'express';
-import post_controller from '../controllers/postController';
-import comment_controller from '../controllers/commentController';
+const express = require('express');
+const post_controller = require('../controllers/postController');
+const comment_controller = require('../controllers/commentController');
 
 const router = express.Router();
 
@@ -38,9 +38,9 @@ router.put(
 );
 
 // delete post comment
-router.put(
+router.delete(
     '/posts/:postId/comments/:commentId',
     comment_controller.deleteComment
 );
 
-export default router;
+module.exports = router;
