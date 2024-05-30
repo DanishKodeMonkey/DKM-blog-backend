@@ -5,7 +5,7 @@ const { body, validationResult } = require('express-validator');
 exports.listUsers = asyncHandler(async (req, res, next) => {
     const allUsers = await Users.find().sort({ username: 1 }).exec();
     if (!allUsers.length) {
-        return res.sendStatus(404, 'No users found');
+        return res.status(404).send('No users found');
     } else {
         res.send(Object.values(allUsers));
     }
