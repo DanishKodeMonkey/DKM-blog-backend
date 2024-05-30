@@ -68,7 +68,7 @@ exports.createUser = [
         if (!errors.isEmpty()) {
             console.error(`Something went wrong, user data: ${user}`);
             console.error(`Errors: ${errors}`);
-            const err = new Error('User update validation failed');
+            const err = new Error('User create validation failed');
             err.status = 400;
             return next(err);
         } else {
@@ -141,6 +141,12 @@ exports.editUser = [
 ];
 
 exports.deleteUser = asyncHandler(async (req, res, next) => {
+    // TODO
+    // Make sure to delete any post and comments by user before getting here.
+    // Note: If posts does the same, maybe the process can be somewhat automated?
+    // Thought: Trigger deleteUser triggers all posts deletePosts triggers all post comments deleteComments.
+    // Make sure this is done asynchronously.
+
     const userId = req.params.userId;
 
     const user = await Users.findById(userId);
@@ -153,5 +159,5 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
     }
 
     await Users.findByIdAndDelete(userId);
-    res.send('User successfully deleted, goodbye.');
+    return res.send('User successfully deleted, goodbye.');
 });
