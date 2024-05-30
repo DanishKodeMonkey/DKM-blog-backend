@@ -6,7 +6,8 @@ const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
 const mongoose = require('mongoose');
-
+// pre-configured passport module
+const passport = require('./config/passport');
 //import routes
 const usersRouter = require('./routes/users');
 const blogRouter = require('./routes/blog');
@@ -26,6 +27,7 @@ app.use(logger('combined'));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
 
 // set up routes
 app.use('/users', usersRouter);
