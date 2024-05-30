@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 // pre-configured passport module
 const passport = require('./config/passport');
 //import routes
+const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
 const blogRouter = require('./routes/blog');
 
@@ -30,6 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 
 // set up routes
+app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/blog', blogRouter);
 
