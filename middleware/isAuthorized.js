@@ -1,4 +1,4 @@
-z; // Check if user is signed in, or admin
+// Check if user is signed in, or admin
 // for routes like user.deleteUser or user.editUser
 
 function isAuthorized(req, res, next) {
