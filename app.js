@@ -31,6 +31,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/users', usersRouter);
 app.use('/blog', blogRouter);
 
+// catch all route for undefined routes
+app.use((req, res, next) => {
+    const err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+// custom error handler for the API
+app.use((err, req, res, next) => {
+    res.status(err.status || 500).json({
+        status: 'error',
+        message: err.message,
+    });
+});
+
 // server setup
 if (process.env.NODE_ENV === 'development') {
     app.listen(process.env.PORT, () =>
