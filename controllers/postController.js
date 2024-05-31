@@ -83,7 +83,7 @@ exports.editPost = [
             text: req.body.text,
             author: req.body.author,
             // remember _id for post update on DB
-            _id: req.params.id,
+            _id: req.params.commentId,
         });
         if (!errors.isEmpty()) {
             console.error(`Something went wrong, user data: ${user}`);
@@ -93,7 +93,7 @@ exports.editPost = [
             return next(err);
         } else {
             const updatedPost = await Posts.findByIdAndUpdate(
-                req.params.id,
+                req.params.postId,
                 post,
                 {}
             );
