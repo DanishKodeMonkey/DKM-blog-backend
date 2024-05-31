@@ -61,18 +61,18 @@ The application uses Passport.js for authentication, supporting both local strat
 #### Post Routes
 
 -   **GET /posts**: Lists all posts.
--   **GET /posts/**:postId: Retrieves a specific post by ID.
+-   **GET /posts/:postId**: Retrieves a specific post by ID.
 -   **POST /posts**: Creates a new post (secured).
--   **PUT /posts/**:postId: Updates an existing post (secured).
--   **DELETE /posts/**:postId: Deletes a post (secured).
+-   **PUT /posts/:postId**: Updates an existing post (secured).
+-   **DELETE /posts/:postId**: Deletes a post (secured).
 
 #### Comment Routes
 
 -   **GET /posts/:postId/comments**: Lists all comments for a specific post.
--   **GET /posts/:postId/comments/**:commentId: Retrieves a specific comment by ID.
+-   **GET /posts/:postId/comments/:commentId**: Retrieves a specific comment by ID.
 -   **POST /posts/:postId/comments**: Creates a new comment (secured).
--   **PUT /posts/:postId/comments/**:commentId: Updates an existing comment (secured).
--   **DELETE /posts/:postId/comments/**:commentId: Deletes a comment (secured).
+-   **PUT /posts/:postId/comments/:commentId**: Updates an existing comment (secured).
+-   **DELETE /posts/:postId/comments/:commentId**: Deletes a comment (secured).
 
 ## Conclusion
 
