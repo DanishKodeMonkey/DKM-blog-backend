@@ -73,7 +73,11 @@ exports.createUser = [
             return next(err);
         } else {
             await user.save();
-            return res.send(`User ${req.body.username} successfully saved!`);
+            return res
+                .status(201)
+                .json({
+                    message: `User ${req.body.username} successfully saved`,
+                });
         }
     }),
 ];
