@@ -8,7 +8,7 @@ function isAuthorized(req, res, next) {
         return next();
     } else {
         // no, stop right there!
-        return res.sendStatus(403, 'Unauthorized access');
+        return res.status(403).send('Unauthorized access.');
     }
 }
 
