@@ -16,8 +16,20 @@ router.get(
 
 router.get(
     '/:userId',
+    (req, res, next) => {
+        console.log('Route hit: /:userId');
+        next();
+    },
     passport.authenticate('jwt', { session: false }),
+    (req, res, next) => {
+        console.log('Passed JWT authentication');
+        next();
+    },
     isAuthorized,
+    (req, res, next) => {
+        console.log('Passed isAuthorized middleweare');
+        next();
+    },
     user_controller.getUser
 );
 
