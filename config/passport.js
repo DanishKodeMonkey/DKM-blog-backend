@@ -14,21 +14,19 @@ const Users = require('../models/user');
 var opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = process.env.JWT_SECRET;
-opts.issuer = 'DKM blog';
-opts.audience = 'DKM-blog.com';
 passport.use(
-    new JwtStrategy(opts, function (jwt_payload, done) {
-        Users.findOne({ id: jwt_payload.sub }, function (err, user) {
-            if (err) {
-                return done(err, false);
-            }
+    new JwtStrategy(opts, async (jwt_payload, done) => {
+        try {
+            const user = await Users.findOne({ _id: jwt_payload.sub });
+
             if (user) {
                 return done(null, user);
             } else {
                 return done(null, false);
-                // maybe redirect to make new account?
             }
-        });
+        } catch (err) {
+            return done(err, false);
+        }
     })
 );
 
@@ -44,12 +42,15 @@ passport.use(
             const match = await bcrypt.compare(password, user.password);
             if (!match) {
                 // passwords do not match
+
                 return done(null, false, { message: 'Incorrect password.' });
             }
             // Otherwise authentication has passed
+
             return done(null, user);
         } catch (err) {
             // Any operation errors
+
             return done(err);
         }
     })
