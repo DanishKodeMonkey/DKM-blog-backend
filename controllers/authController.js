@@ -13,7 +13,7 @@ exports.signIn = asyncHandler(async (req, res, next) => {
             });
         }
         // Once found, attempt to log in, opting out of a session method(this will be handled in jwt)
-        req.login(user, { session: false }, async err => {
+        req.login(user, { session: false }, async (err) => {
             if (err) {
                 return res.status(err.status || 500).json({
                     status: 'error',
@@ -27,7 +27,6 @@ exports.signIn = asyncHandler(async (req, res, next) => {
         const token = jwt.sign(body, process.env.JWT_SECRET, {
             expiresIn: '1h',
         });
-
         // return the signed jwt token.
         return res.json({ token });
         // and invoke this process immediately.
