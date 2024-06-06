@@ -8,7 +8,9 @@ function isAuthorized(req, res, next) {
         return next();
     } else {
         // no, stop right there!
-        return res.status(403).send('Unauthorized access.');
+        const err = new Error('Unauthorized access.');
+        err.status = 401;
+        return next(err);
     }
 }
 
