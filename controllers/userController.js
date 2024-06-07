@@ -138,39 +138,6 @@ exports.editUser = [
         } catch (error) {
             next(error);
         }
-        /* 
-        console.log('creating new user object');
-        // create new user object with verified data
-        const user = new Users({
-            username: req.body.username,
-            first_name: req.body.first_name,
-            last_name: req.body.last_name,
-            email: req.body.email,
-            password: req.body.password,
-            // remember _id for user update on DB
-            _id: req.params.userId,
-        });
-        console.log('user object created', user);
-        if (!errors.isEmpty()) {
-            console.error(`Something went wrong, user data: ${user}`);
-            console.error(`Errors: ${errors}`);
-            const err = new Error('User update validation failed');
-            err.status = 400;
-            return next(err);
-        } else {
-            console.log('Trying to update user', user, req.params.userId);
-            const updatedUser = await Users.findByIdAndUpdate(
-                req.params.userId,
-                user,
-                { new: true, runValidators: true }
-            );
-            if (!updatedUser) {
-                console.error('404, User not found');
-                return res.status(404).send('User not found');
-            }
-            console.log('Operation successful!');
-            res.json(updatedUser);
-        } */
     }),
 ];
 
