@@ -16,6 +16,7 @@ opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = process.env.JWT_SECRET;
 passport.use(
     new JwtStrategy(opts, async (jwt_payload, done) => {
+        console.warn('JWT strategy triggered');
         try {
             const user = await Users.findOne({ _id: jwt_payload.sub });
 
@@ -33,6 +34,7 @@ passport.use(
 // Local strategy setup
 passport.use(
     new LocalStrategy(async (username, password, done) => {
+        console.warn('LocalStrategy strategy triggered...');
         try {
             const user = await Users.findOne({ username: username });
             if (!user) {
