@@ -18,7 +18,7 @@ const UserSchema = new Schema({
         enum: ['User', 'Author'],
         default: 'User',
     },
-    password: { type: String, required: true, minLength: 4, maxLength: 9999 },
+    password: { type: String, maxLength: 9999 },
     posts: [{ type: Schema.Types.ObjectId, ref: 'Posts' }],
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comments' }],
 });
@@ -28,6 +28,7 @@ UserSchema.virtual('url').get(function () {
 });
 
 UserSchema.pre('save', async function (next) {
+    console.log('Updating password...');
     if (this.isModified('password') || this.isNew) {
         this.password = await bcrypt.hash(this.password, 10);
     }
