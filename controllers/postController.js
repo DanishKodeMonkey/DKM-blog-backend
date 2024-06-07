@@ -6,7 +6,14 @@ exports.listPosts = asyncHandler(async (req, res, next) => {
     const allPosts = await Posts.find()
         .sort({ timestamp: 1 })
         .populate('author', 'username')
-        .populate({ path: 'comments', select: 'text timestamp' })
+        .populate({
+            path: 'comments',
+            select: 'text timestamp author',
+            populate: {
+                path: 'author',
+                select: 'username',
+            },
+        })
         .exec();
     if (allPosts.length === 0) {
         return res.status(404).send('No posts found');
