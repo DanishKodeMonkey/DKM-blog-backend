@@ -22,7 +22,11 @@ exports.signIn = asyncHandler(async (req, res, next) => {
             }
         });
         // Establish JWT payload 'body'.
-        const body = { sub: user.id, username: user.username };
+        const body = {
+            sub: user.id,
+            username: user.username,
+            membership: user.membership,
+        };
         // sign, and attach a token to the body
         const token = jwt.sign(body, process.env.JWT_SECRET, {
             expiresIn: '1h',
