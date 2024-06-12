@@ -3,6 +3,21 @@ const Comments = require('../models/comment.js');
 const Posts = require('../models/post.js');
 const { body, validationResult } = require('express-validator');
 
+// Fetches all comments from all posts
+exports.listAllPostsComments = asyncHandler(async (req, res, next) => {
+    const allPostsComments = awaitComments
+        .find()
+        .sort({ timestamp: 1 })
+        .populate('author', 'username')
+        .exec();
+
+    if (allPostsComments.length === 0) {
+        return res.status(404).send('No comments found');
+    } else {
+        res.send(allPostsComments);
+    }
+});
+
 // Fetches all comments associated to a given post
 exports.listComments = asyncHandler(async (req, res, next) => {
     const allComments = await Comments.find({ post: req.params.postId })

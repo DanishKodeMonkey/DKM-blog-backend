@@ -39,6 +39,8 @@ router.delete(
 );
 
 // Comments routes
+// list all comments on all posts
+router.get('/posts/comments', comment_controller.listAllPostsComments);
 
 // list posts comments
 router.get('/posts/:postId/comments', comment_controller.listComments);

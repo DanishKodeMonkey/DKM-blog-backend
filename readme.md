@@ -68,6 +68,7 @@ The application uses Passport.js for authentication, supporting both local strat
 
 #### Comment Routes
 
+-   **GET /posts/comments**: Lists all comments for all posts.
 -   **GET /posts/:postId/comments**: Lists all comments for a specific post.
 -   **GET /posts/:postId/comments/:commentId**: Retrieves a specific comment by ID.
 -   **POST /posts/:postId/comments**: Creates a new comment (secured).
