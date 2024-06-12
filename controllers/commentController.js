@@ -5,15 +5,18 @@ const { body, validationResult } = require('express-validator');
 
 // Fetches all comments from all posts
 exports.listAllPostsComments = asyncHandler(async (req, res, next) => {
-    const allPostsComments = awaitComments
-        .find()
+    console.warn('Trying to list all posts comments');
+    const allPostsComments = await Comments.find()
         .sort({ timestamp: 1 })
         .populate('author', 'username')
+        .populate('post', 'title')
         .exec();
 
     if (allPostsComments.length === 0) {
+        console.error('No comments found');
         return res.status(404).send('No comments found');
     } else {
+        console.log('Success, sending all posts comments');
         res.send(allPostsComments);
     }
 });
