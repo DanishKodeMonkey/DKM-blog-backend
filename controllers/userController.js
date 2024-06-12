@@ -12,7 +12,16 @@ exports.listUsers = asyncHandler(async (req, res, next) => {
 });
 
 exports.getUser = asyncHandler(async (req, res, next) => {
-    const user = await Users.findById(req.params.userId).exec();
+    const user = await Users.findById(req.params.userId)
+        .populate({
+            path: 'posts',
+            select: 'title timestamp',
+        })
+        .populate({
+            path: 'comments',
+            select: 'text timestamp',
+        })
+        .exec();
 
     if (!user) {
         // no results
