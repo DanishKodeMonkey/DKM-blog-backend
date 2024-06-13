@@ -23,7 +23,14 @@ exports.listPosts = asyncHandler(async (req, res, next) => {
 });
 
 exports.getPost = asyncHandler(async (req, res, next) => {
-    const post = await Posts.findById(req.params.postId).exec();
+    const post = await Posts.findById(req.params.postId)
+        .populate('author', 'username')
+        .populate({
+            path: 'comments',
+            select: 'text timestamp author',
+            populate: { path: 'author', select: 'username' },
+        })
+        .exec();
     if (!post) {
         // no results
         console.error(`Something went wrong, post data: ${post}`);
