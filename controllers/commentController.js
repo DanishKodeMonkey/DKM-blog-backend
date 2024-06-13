@@ -35,8 +35,12 @@ exports.listComments = asyncHandler(async (req, res, next) => {
     }
 });
 
+// fetch specific comment
 exports.getComment = asyncHandler(async (req, res, next) => {
-    const comment = await Comments.findById(req.params.commentId).exec();
+    const comment = await Comments.findById(req.params.commentId)
+        .populate('post', 'title')
+        .populate('author', 'username')
+        .exec();
     if (!comment) {
         // no result
         const err = new Error('Comment not found');
