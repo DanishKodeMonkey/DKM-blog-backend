@@ -63,8 +63,8 @@ exports.createPost = [
             author: req.body.author,
         });
         if (!errors.isEmpty()) {
-            console.error(`Something went wrong, user data: ${user}`);
-            console.error(`Errors: ${errors}`);
+            console.error(`Something went wrong, post data: ${post}}`);
+            console.error(`Errors: ${errors.array()}`);
             const err = new Error('Post create validation failed');
             err.status = 400;
             return next(err);
