@@ -4,7 +4,7 @@ const { body, validationResult } = require('express-validator');
 
 exports.listPosts = asyncHandler(async (req, res, next) => {
     const allPosts = await Posts.find()
-        .sort({ timestamp: 1 })
+        .sort({ timestamp: -1 })
         .populate('author', 'username')
         .populate({
             path: 'comments',
