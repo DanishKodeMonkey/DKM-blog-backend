@@ -98,10 +98,10 @@ exports.editPost = [
             text: req.body.text,
             author: req.body.author,
             // remember _id for post update on DB
-            _id: req.params.commentId,
+            _id: req.params.postId,
         });
         if (!errors.isEmpty()) {
-            console.error(`Something went wrong, user data: ${user}`);
+            console.error(`Something went wrong, post data: ${post}`);
             console.error(`Errors: ${errors}`);
             const err = new Error('Post update validation failed');
             err.status = 400;
