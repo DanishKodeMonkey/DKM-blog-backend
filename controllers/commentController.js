@@ -123,9 +123,11 @@ exports.editComment = [
 ];
 exports.deleteComment = asyncHandler(async (req, res, next) => {
     const commentId = req.params.commentId;
+    console.log(commentId, ' found');
     const comment = await Comments.findById(commentId);
 
     if (!comment) {
+        console.error('Error, comment not found', commentId, comment);
         return res.status(404).send('Comment not found');
     }
     await Comments.findByIdAndDelete(commentId);
