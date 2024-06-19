@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Posts = require('../models/post');
+const Users = require('../models/user');
 const { body, validationResult } = require('express-validator');
 
 exports.listPosts = asyncHandler(async (req, res, next) => {
@@ -70,6 +71,9 @@ exports.createPost = [
             return next(err);
         } else {
             await post.save();
+            await Users.findByIdAndUpdate(req.body.author, {
+                $push: { posts: post._id },
+            });
             return res.send(
                 `Post ${req.body.title} has been successfully saved!`
             );
