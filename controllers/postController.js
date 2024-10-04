@@ -1,21 +1,10 @@
 const asyncHandler = require('express-async-handler');
-const Posts = require('../models/post');
-const Users = require('../models/user');
+const postQueries = require('../db/prismaQueries');
 const { body, validationResult } = require('express-validator');
 
 exports.listPosts = asyncHandler(async (req, res, next) => {
-    const allPosts = await Posts.find()
-        .sort({ timestamp: -1 })
-        .populate('author', 'username')
-        .populate({
-            path: 'comments',
-            select: 'text timestamp author',
-            populate: {
-                path: 'author',
-                select: 'username',
-            },
-        })
-        .exec();
+    const allPosts = await postQueries.listPosts();
+
     if (allPosts.length === 0) {
         return res.status(404).send('No posts found');
     } else {
@@ -24,14 +13,8 @@ exports.listPosts = asyncHandler(async (req, res, next) => {
 });
 
 exports.getPost = asyncHandler(async (req, res, next) => {
-    const post = await Posts.findById(req.params.postId)
-        .populate('author', 'username')
-        .populate({
-            path: 'comments',
-            select: 'text timestamp author',
-            populate: { path: 'author', select: 'username' },
-        })
-        .exec();
+    const post = await postQueries.getPost(req.params.postId);
+
     if (!post) {
         // no results
         console.error(`Something went wrong, post data: ${post}`);
@@ -57,11 +40,18 @@ exports.createPost = [
         // extract errors from request
         const errors = validationResult(req);
 
+        const userId = await postQueries.getUserIdByUsername(req.body.author);
+
+        if (!userId) {
+            const err = new Error('Author not found');
+            err.status = 404;
+            return next(err);
+        }
         // create new post object with verified data
-        const post = new Posts({
+        const newPost = await prisma.postQueries.createPost({
             title: req.body.title,
             text: req.body.text,
-            author: req.body.author,
+            authorId: userId,
         });
         if (!errors.isEmpty()) {
             console.error(`Something went wrong, post data: ${post}}`);
@@ -70,12 +60,8 @@ exports.createPost = [
             err.status = 400;
             return next(err);
         } else {
-            await post.save();
-            await Users.findByIdAndUpdate(req.body.author, {
-                $push: { posts: post._id },
-            });
             return res.send(
-                `Post ${req.body.title} has been successfully saved!`
+                `Post ${newPost.title} has been successfully saved!`
             );
         }
     }),
@@ -96,14 +82,25 @@ exports.editPost = [
         // extract errors from request
         const errors = validationResult(req);
 
-        // create new post object with verified data
-        const post = new Posts({
+        const authorId = await postQueries.getUserIdByUsername(req.body.author);
+
+        if (!authorId) {
+            const err = new Error('Author not found');
+            err.status = 404;
+            return next(err);
+        }
+
+        const updatedData = {
             title: req.body.title,
             text: req.body.text,
-            author: req.body.author,
-            // remember _id for post update on DB
-            _id: req.params.postId,
+            authorId: authorId,
+        };
+
+        const updatedPost = await postQueries.editPost({
+            postId: parseInt(req.params.postId),
+            data: updatedData,
         });
+
         if (!errors.isEmpty()) {
             console.error(`Something went wrong, post data: ${post}`);
             console.error(`Errors: ${errors}`);
@@ -111,27 +108,17 @@ exports.editPost = [
             err.status = 400;
             return next(err);
         } else {
-            const updatedPost = await Posts.findByIdAndUpdate(
-                req.params.postId,
-                post,
-                {}
+            res.send(
+                `Post ${updatedPost.data.title} was updated successfully! `
             );
-            res.send(`Post ${req.body.title} was updated successfully! `);
         }
     }),
 ];
 
 exports.deletePost = asyncHandler(async (req, res, next) => {
-    // TODO
-    // Make sure to delete any comments before getting here.
+    const postId = parseInt(req.params.postId);
 
-    // for now, just remove the post if it exist.
-    const postId = req.params.postId;
+    const post = await postQueries.deletePost(postId);
 
-    const post = await Posts.findById(postId);
-    if (!post) {
-        return res.status(404).send('Post not found');
-    }
-    await Posts.findByIdAndDelete(postId);
-    return res.send('Post has been successfully deleted.');
+    return res.send(`${post.title}has been successfully deleted.`);
 });
