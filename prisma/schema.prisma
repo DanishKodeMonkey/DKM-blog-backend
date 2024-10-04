@@ -17,11 +17,10 @@ model Comment {
   id        Int      @id @default(autoincrement())
   text      String   @db.VarChar(600)
   timestamp DateTime @default(now())
-
-  Post   Post? @relation(fields: [postId], references: [id])
-  postId Int?
-  Author User? @relation(fields: [userId], references: [id])
-  userId Int?
+  Post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int?
+  author    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId    Int?
 }
 
 model Post {
@@ -31,7 +30,7 @@ model Post {
   timestamp DateTime  @default(now())
   published Boolean   @default(true)
   comments  Comment[]
-  Author    User?     @relation(fields: [userId], references: [id])
+  author    User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId    Int?
 }
 
