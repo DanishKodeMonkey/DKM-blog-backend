@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const { commentQueries, postQueries } = require('../db/prismaQueries');
+const { commentQueries } = require('../db/prismaQueries');
 const { body, validationResult } = require('express-validator');
 
 // Fetches all comments from all posts

@@ -1,12 +1,12 @@
 const asyncHandler = require('express-async-handler');
-const postQueries = require('../db/prismaQueries');
+const { postQueries } = require('../db/prismaQueries');
 const { body, validationResult } = require('express-validator');
 
 exports.listPosts = asyncHandler(async (req, res, next) => {
     const allPosts = await postQueries.listPosts();
 
     if (allPosts.length === 0) {
-        return res.status(404).send('No posts found');
+        return res.status(204).send('No posts found');
     } else {
         res.send(Object.values(allPosts));
     }
