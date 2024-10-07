@@ -5,7 +5,6 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
-const mongoose = require('mongoose');
 // pre-configured passport module
 const passport = require('./config/passport');
 //import routes
@@ -15,17 +14,7 @@ const blogRouter = require('./routes/blog');
 
 const app = express();
 console.warn('Starting express app..');
-// mongoDB setup and connect
-mongoose.set('strictQuery', false);
-const mongoDB = process.env.MONGO_URI;
-// attempt to start MongoDB operation
 
-console.warn('Setting up mongoose connection...');
-main().catch((err) => console.error(err));
-async function main() {
-    console.log('Connecting to MongoDb...');
-    await mongoose.connect(mongoDB);
-}
 // custom error handler for the API
 app.use((err, req, res, next) => {
     console.error('custom error handler triggered');

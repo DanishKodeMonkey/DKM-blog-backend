@@ -8,7 +8,7 @@ const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt;
 const LocalStrategy = require('passport-local');
-const Users = require('../models/user');
+const prisma = require('../db/prismaClient');
 
 // JWT strategy setup
 var opts = {};
@@ -18,7 +18,11 @@ passport.use(
     new JwtStrategy(opts, async (jwt_payload, done) => {
         console.warn('JWT strategy triggered');
         try {
-            const user = await Users.findOne({ _id: jwt_payload.sub });
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: jwt_payload.sub,
+                },
+            });
 
             if (user) {
                 return done(null, user);
@@ -36,7 +40,9 @@ passport.use(
     new LocalStrategy(async (username, password, done) => {
         console.warn('LocalStrategy strategy triggered...');
         try {
-            const user = await Users.findOne({ username: username });
+            const user = await prisma.user.findUnique({
+                where: { username: username },
+            });
             if (!user) {
                 return done(null, false, { message: 'Incorrect username' });
             }
