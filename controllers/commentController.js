@@ -1,16 +1,11 @@
 const asyncHandler = require('express-async-handler');
-const Comments = require('../models/comment.js');
-const Posts = require('../models/post.js');
+const { commentQueries, postQueries } = require('../db/prismaQueries');
 const { body, validationResult } = require('express-validator');
 
 // Fetches all comments from all posts
 exports.listAllPostsComments = asyncHandler(async (req, res, next) => {
     console.warn('Trying to list all posts comments');
-    const allPostsComments = await Comments.find()
-        .sort({ timestamp: 1 })
-        .populate('author', 'username')
-        .populate('post', 'title')
-        .exec();
+    const allPostsComments = await commentQueries.listAllPostsComments();
 
     if (allPostsComments.length === 0) {
         console.error('No comments found');
@@ -23,10 +18,8 @@ exports.listAllPostsComments = asyncHandler(async (req, res, next) => {
 
 // Fetches all comments associated to a given post
 exports.listComments = asyncHandler(async (req, res, next) => {
-    const allComments = await Comments.find({ post: req.params.postId })
-        .sort({ timestamp: 1 })
-        .populate('author', 'username')
-        .exec();
+    const postId = parseInt(req.params.postId);
+    const allComments = await commentQueries.listComments(postId);
 
     if (allComments.length === 0) {
         return res.status(404).send('No comments found');
@@ -37,10 +30,8 @@ exports.listComments = asyncHandler(async (req, res, next) => {
 
 // fetch specific comment
 exports.getComment = asyncHandler(async (req, res, next) => {
-    const comment = await Comments.findById(req.params.commentId)
-        .populate('post', 'title')
-        .populate('author', 'username')
-        .exec();
+    const commentId = parseInt(req.params.commentId);
+    const comment = await commentQueries.getComment(commentId);
     if (!comment) {
         // no result
         const err = new Error('Comment not found');
@@ -64,24 +55,26 @@ exports.createComment = [
         const errors = validationResult(req);
 
         // create new comment object with verified data
-        const comment = new Comments({
-            text: req.body.text,
-            post: req.params.postId,
-            author: req.body.author,
-        });
+
         if (!errors.isEmpty()) {
             console.error(`Validation errors: ${errors.array()}`);
             return res.status(400).json({ errors: errors.array() });
         } else {
-            await comment.save();
+            const { text, authorId } = req.body;
+            const postId = parseInt(req.params.postId);
+            const newComment = await commentQueries.createComment({
+                text,
+                postId,
+                authorId,
+            });
 
-            // update comment array of post
-            await Posts.findByIdAndUpdate(
-                req.params.postId,
-                { $push: { comments: comment._id } },
-                { new: true }
-            );
-            return res.status(204).send(`Comment has been successfully saved!`);
+            if (newComment) {
+                return res
+                    .status(201)
+                    .send(`Comment has been successfully saved!`);
+            } else {
+                throw new Error('Failed to save comment');
+            }
         }
     }),
 ];
@@ -101,35 +94,37 @@ exports.editComment = [
         const errors = validationResult(req);
 
         // create new comment object with verified data
-        const comment = new Comments({
-            text: req.body.text,
-            post: req.params.postId,
-            author: req.body.author,
-            // remember _id for comment update on DB
-            _id: req.params.commentId,
-        });
         if (!errors.isEmpty()) {
             console.error(`Validation errors: ${errors.array()}`);
             return res.status(400).json({ errors: errors.array() });
         } else {
-            const updatedComment = await Comments.findByIdAndUpdate(
-                req.params.commentId,
-                comment,
-                {}
-            );
-            res.send('Comment was successfully updated');
+            const { text, authorId } = req.body;
+            const postId = parseInt(req.params.postId);
+            const commentId = parseInt(req.params.commentId);
+
+            const updatedComment = await commentQueries.editComment({
+                commentId,
+                text,
+                postId,
+                authorId,
+            });
+            if (updatedComment) {
+                res.status(200).send('Comment was successfully updated');
+            } else {
+                throw new Error('Failed to update comment');
+            }
         }
     }),
 ];
 exports.deleteComment = asyncHandler(async (req, res, next) => {
-    const commentId = req.params.commentId;
-    console.log(commentId, ' found');
-    const comment = await Comments.findById(commentId);
+    const commentId = parseInt(req.params.commentId);
 
-    if (!comment) {
-        console.error('Error, comment not found', commentId, comment);
-        return res.status(404).send('Comment not found');
+    const deletedComment = await commentQueries.deleteComment({ commentId });
+
+    if (deletedComment) {
+        res.status(200).send('Comment has been successfully deleted');
+    } else {
+        console.error('Error, comment not found');
+        res.status(404).send('Comment not found');
     }
-    await Comments.findByIdAndDelete(commentId);
-    return res.send('Comment has been successfully deleted');
 });
