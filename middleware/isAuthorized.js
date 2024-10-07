@@ -2,8 +2,12 @@
 // for routes like user.deleteUser or user.editUser
 
 function isAuthorized(req, res, next) {
+    const paramsId = parseInt(req.params.userId);
+    const userId = parseInt(req.user.id);
+    console.log('Hit isAuthorized with: ', req.params.userId, req.user.id);
+    console.log('Matching user ID', paramsId, userId);
     // Is the client the user? Or an Author(admin)?
-    if (req.user.id === req.params.userId || req.user.membership === 'Author') {
+    if (userId === paramsId || req.user.membership === 'Author') {
         // yes, proceed to next middleware
         return next();
     } else {
