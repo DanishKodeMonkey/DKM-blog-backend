@@ -1,3 +1,4 @@
+const { listComments } = require('../controllers/commentController');
 const prisma = require('./prismaClient');
 
 const userQueries = {
@@ -35,7 +36,7 @@ const userQueries = {
             return updatedUser;
         } catch (err) {
             console.error('Error updating user data; ', err);
-            throw new Error('Failed to update using');
+            throw new Error('Failed to update user');
         }
     },
     deleteUser: async (userId) => {
@@ -165,14 +166,14 @@ const postQueries = {
             throw new Error('Error creating post');
         }
     },
-    editPost: async ({ postId, data }) => {
+    editPost: async ({ postId, title, text, authorId }) => {
         try {
             const updatedPost = await prisma.post.update({
                 where: { id: postId },
                 data: {
-                    title: data.title,
-                    text: data.text,
-                    author: data.authorId,
+                    title: title,
+                    text: text,
+                    userId: authorId,
                 },
             });
             return updatedPost;
@@ -194,4 +195,94 @@ const postQueries = {
     },
 };
 
-module.exports = { userQueries };
+const commentQueries = {
+    listAllPostsComments: async () => {
+        try {
+            const postsAndComments = await prisma.comment.findMany({
+                orderBy: { timestamp: 'asc' },
+                include: {
+                    author: { select: { username: true } },
+                    post: {
+                        select: { title: true },
+                    },
+                },
+            });
+            return postsAndComments;
+        } catch (err) {
+            console.error('Error fetching all posts comments: ', err);
+            throw new Error('Error fetching comments for posts');
+        }
+    },
+    listComments: async (postId) => {
+        try {
+            const postComments = await prisma.comment.findMany({
+                where: { postId: postId },
+                orderBy: { timestamp: 'asc' },
+                include: { author: { select: { username: true } } },
+            });
+            return postComments;
+        } catch (err) {
+            console.error('Error fetching all comments: ', err);
+            throw new Error('Error fetching comments');
+        }
+    },
+    getComment: async (commentId) => {
+        try {
+            const comment = await prisma.comment.findUnique({
+                where: { id: commentId },
+                include: {
+                    post: { select: { title: true } },
+                    author: { select: { username: true } },
+                },
+            });
+            return comment;
+        } catch (err) {
+            console.error('Error fetching comment: ', err);
+            throw new Error('Error fetching comment');
+        }
+    },
+    createComment: async ({ text, postId, authorId }) => {
+        try {
+            const newComment = await prisma.comment.create({
+                data: {
+                    text: text,
+                    postId: postId,
+                    userId: authorId,
+                },
+            });
+            return newComment;
+        } catch (err) {
+            console.error('Error creating comment: ', err);
+            throw new Error('Error creating comment');
+        }
+    },
+    editComment: async ({ commentId, text, postId, authorId }) => {
+        try {
+            const updatedComment = await prisma.comment.update({
+                where: { id: commentId },
+                data: {
+                    text: text,
+                    postId: postId,
+                    userId: authorId,
+                },
+            });
+            return updatedComment;
+        } catch (err) {
+            console.error('Error updating comment: ', err);
+            throw new Error('Error updating comment');
+        }
+    },
+    deleteComment: async (commentId) => {
+        try {
+            const deletedComment = await prisma.comment.delete({
+                where: { id: commentId },
+            });
+            return deletedComment;
+        } catch (err) {
+            console.error('Error deleting comment: ', err);
+            throw new Error('Error deleting comment');
+        }
+    },
+};
+
+module.exports = { userQueries, postQueries, commentQueries };
