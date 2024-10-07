@@ -1,25 +1,10 @@
-const { listComments } = require('../controllers/commentController');
 const prisma = require('./prismaClient');
 
 const userQueries = {
-    createUser: async ({
-        username,
-        first_name,
-        last_name,
-        email,
-        password,
-        membership,
-    }) => {
+    createUser: async (userData) => {
         try {
             const newUser = await prisma.user.create({
-                data: {
-                    username,
-                    first_name,
-                    last_name,
-                    email,
-                    password,
-                    membership,
-                },
+                data: userData,
             });
             return newUser;
         } catch (err) {
