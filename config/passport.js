@@ -40,7 +40,7 @@ passport.use(
     new LocalStrategy(async (username, password, done) => {
         console.warn('LocalStrategy strategy triggered...');
         try {
-            const user = await prisma.user.findUnique({
+            const user = await prisma.user.findFirst({
                 where: { username: username },
             });
             if (!user) {
