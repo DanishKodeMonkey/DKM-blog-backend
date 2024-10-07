@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcryptjs');
-const userQueries = require('../db/prismaQueries');
+const { userQueries } = require('../db/prismaQueries');
 const { body, validationResult } = require('express-validator');
 
 exports.listUsers = asyncHandler(async (req, res, next) => {
@@ -13,6 +13,7 @@ exports.listUsers = asyncHandler(async (req, res, next) => {
 });
 
 exports.getUser = asyncHandler(async (req, res, next) => {
+    console.log('Trying to get user: ', req.params.userId);
     const user = await userQueries.getUser(req.params.userId);
 
     if (!user) {
@@ -57,11 +58,27 @@ exports.createUser = [
     asyncHandler(async (req, res, next) => {
         // extract validatio nerrors from request
         const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            console.error(`Something went wrong, user data: ${user}`);
+            console.error(`Errors: ${errors}`);
+            const err = new Error('User create validation failed');
+            err.status = 400;
+            return next(err);
+        }
 
+        const password = req.body.password;
         // bcrypt for password
         const hashedPassword = await bcrypt.hash(password, 10);
-
+        console.log(userQueries);
         // create new user object with verified data
+        console.log('Creating user with data: ', {
+            username: req.body.username,
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
+            email: req.body.email,
+            password: hashedPassword,
+            membership: req.body.membership || 'User',
+        });
         const newUser = await userQueries.createUser({
             username: req.body.username,
             first_name: req.body.first_name,
@@ -71,17 +88,9 @@ exports.createUser = [
             membership: req.body.membership || 'User', //default membership is User
         });
 
-        if (!errors.isEmpty()) {
-            console.error(`Something went wrong, user data: ${user}`);
-            console.error(`Errors: ${errors}`);
-            const err = new Error('User create validation failed');
-            err.status = 400;
-            return next(err);
-        } else {
-            return res.status(201).json({
-                message: `User ${req.body.username} successfully saved`,
-            });
-        }
+        return res.status(201).json({
+            message: `User ${newUser.username} successfully saved`,
+        });
     }),
 ];
 
