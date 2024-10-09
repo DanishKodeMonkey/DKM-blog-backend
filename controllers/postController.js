@@ -4,6 +4,7 @@ const { body, validationResult } = require('express-validator');
 
 exports.listPosts = asyncHandler(async (req, res, next) => {
     const allPosts = await postQueries.listPosts();
+    console.log(allPosts);
 
     if (allPosts.length === 0) {
         return res.status(204).send('No posts found');
@@ -48,10 +49,10 @@ exports.createPost = [
             return next(err);
         }
         // create new post object with verified data
-        const newPost = await prisma.postQueries.createPost({
+        const newPost = await postQueries.createPost({
             title: req.body.title,
             text: req.body.text,
-            authorId: userId,
+            userId: userId,
         });
         if (!errors.isEmpty()) {
             console.error(`Something went wrong, post data: ${post}}`);
