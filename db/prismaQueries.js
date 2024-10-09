@@ -66,7 +66,7 @@ const userQueries = {
 const postQueries = {
     getUserIdByUsername: async (username) => {
         try {
-            const user = await prisma.user.findUnique({
+            const user = await prisma.user.findFirst({
                 where: { username: username },
                 select: { id: true },
             });
@@ -136,13 +136,13 @@ const postQueries = {
             throw new Error('Error fetching post');
         }
     },
-    createPost: async ({ title, text, authorId }) => {
+    createPost: async ({ title, text, userId }) => {
         try {
             const post = await prisma.post.create({
                 data: {
                     title,
                     text,
-                    authorId,
+                    userId,
                 },
             });
             return post;
@@ -151,14 +151,14 @@ const postQueries = {
             throw new Error('Error creating post');
         }
     },
-    editPost: async ({ postId, title, text, authorId }) => {
+    editPost: async ({ postId, title, text, userId }) => {
         try {
             const updatedPost = await prisma.post.update({
                 where: { id: postId },
                 data: {
                     title: title,
                     text: text,
-                    userId: authorId,
+                    userId: userId,
                 },
             });
             return updatedPost;
